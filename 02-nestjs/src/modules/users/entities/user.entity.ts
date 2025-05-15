@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -12,14 +13,22 @@ export class User {
   fullName: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column({ default: 'user' })
   role: string;
 
+  @Column({ default: 'local' })
+  accountType: string;
+
   @Column({ default: false })
   isActive: boolean;
 
-  @Column()
-  activeCode: number;
+  @Column({ type: 'varchar', nullable: true })
+  @Exclude()
+  activeCode: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  codeExpired: Date | null;
 }
