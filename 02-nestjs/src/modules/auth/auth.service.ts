@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   RegisterAuthDto,
-  CodeVerifyAuthDto,
+  ResendCodeAuthDto,
+  VerifyCodeAuthDto,
 } from 'src/modules/auth/dto/auth.dto';
 
 import { UsersService } from 'src/modules/users/users.service';
@@ -13,7 +14,11 @@ export class AuthService {
     return this.usersService.register(data);
   }
 
-  codeVerify(data: CodeVerifyAuthDto) {
-    return this.usersService.codeVerify(data);
+  verifyCode(data: VerifyCodeAuthDto) {
+    return this.usersService.verifyCode(data);
+  }
+
+  resendCode(data: ResendCodeAuthDto) {
+    return this.usersService.resendCode(data);
   }
 }

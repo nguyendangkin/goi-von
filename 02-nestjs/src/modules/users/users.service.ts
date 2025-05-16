@@ -9,7 +9,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { MailerService } from '@nestjs-modules/mailer';
 import {
   RegisterAuthDto,
-  CodeVerifyAuthDto,
+  ResendCodeAuthDto,
+  VerifyCodeAuthDto,
 } from 'src/modules/auth/dto/auth.dto';
 
 @Injectable()
@@ -24,11 +25,27 @@ export class UsersService {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  async codeVerify(data: CodeVerifyAuthDto) {
-    // Check user by email
-    const user = await this.usersRepository.findOne({
-      where: { email: data.email },
+  async sendActivationEmail(user: User, activationCode: string) {
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Kích hoạt tài khoản của bạn',
+      template: 'sendEmailCode',
+      context: {
+        fullName: user.fullName,
+        activationCode: activationCode,
+      },
     });
+  }
+
+  async findUserByEmail(email: string) {
+    return await this.usersRepository.findOne({
+      where: { email: email },
+    });
+  }
+
+  async verifyCode(data: VerifyCodeAuthDto) {
+    // Find user by email
+    const user = await this.findUserByEmail(data.email);
     if (!user) {
       throw new BadRequestException('Email không tồn tại.');
     }
@@ -36,20 +53,22 @@ export class UsersService {
     if (user.isActive) {
       throw new BadRequestException('Tài khoản đã được kích hoạt');
     }
-    // Check code
-    if (user.activeCode !== data.activeCode) {
-      throw new BadRequestException('Mã kích hoạt không kích xác');
-    }
 
     // Check expired date
-    const isExpired = dayjs().isBefore(user.codeExpired);
+    const isExpired = dayjs().isAfter(user.codeExpired);
     if (isExpired) {
+      console.log(isExpired);
       throw new BadRequestException('Mã kích hoạt đã hết hạn');
+    }
+
+    // Check code
+    if (user.activationCode !== data.activationCode) {
+      throw new BadRequestException('Mã kích hoạt không kích xác');
     }
 
     // Update and save
     user.isActive = true;
-    user.activeCode = null;
+    user.activationCode = null;
     user.codeExpired = null;
     await this.usersRepository.save(user);
 
@@ -78,29 +97,46 @@ export class UsersService {
     // Hash password
     const newPassword = await this.hashPassword(data.password);
     // Create and save
-    const activeCode = this.generateCode();
+    const activationCode = this.generateCode();
     const user = this.usersRepository.create({
       email: data.email,
       fullName: data.fullName,
       password: newPassword,
       isActive: false,
-      activeCode: activeCode,
-      codeExpired: dayjs().add(5, 'minutes'),
+      activationCode: activationCode,
+      codeExpired: dayjs().add(5, 'minutes').toDate(),
     });
     await this.usersRepository.save(user);
     // Send email
-    this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Kích hoạt tài khoản của bạn',
-      template: 'sendEmailCode',
-      context: {
-        fullName: user.fullName,
-        activeCode: activeCode,
-      },
-    });
+    await this.sendActivationEmail(user, activationCode);
     return {
       message: 'Đăng ký tài khoản thành công, vui lòng kích hoạt',
       id: user.id,
+    };
+  }
+
+  async resendCode(data: ResendCodeAuthDto) {
+    // Find user by email
+    const user = await this.findUserByEmail(data.email);
+
+    if (!user) {
+      throw new BadRequestException('Email không tồn tại');
+    }
+
+    // Check isActive?
+    if (user.isActive) {
+      throw new BadRequestException('Tài khoản đã được kích hoạt');
+    }
+
+    // Tạo và save code mới
+    const activationCode = this.generateCode();
+    user.activationCode = activationCode;
+    user.codeExpired = dayjs().add(5, 'minutes').toDate();
+    await this.usersRepository.save(user);
+    // Send email
+    await this.sendActivationEmail(user, activationCode);
+    return {
+      message: 'Đã gửi lại mã kích hoạt',
     };
   }
 }

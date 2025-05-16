@@ -27,7 +27,7 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true })
   @Exclude()
-  activeCode: string | null;
+  activationCode: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
   codeExpired: Date | null;

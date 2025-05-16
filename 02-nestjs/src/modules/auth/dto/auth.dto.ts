@@ -18,11 +18,17 @@ export class RegisterAuthDto {
   password: string;
 }
 
-export class CodeVerifyAuthDto {
+export class VerifyCodeAuthDto {
   @IsNotEmpty({ message: 'Email không được để trống' })
   @IsEmail({}, { message: 'Email không đúng định dạng' })
   email: string;
 
   @IsNotEmpty({ message: 'Mã kích hoạt không được để trống' })
-  activeCode: string;
+  activationCode: string;
+}
+
+export class ResendCodeAuthDto {
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  @IsEmail({}, { message: 'Email không đúng định dạng' })
+  email: string;
 }

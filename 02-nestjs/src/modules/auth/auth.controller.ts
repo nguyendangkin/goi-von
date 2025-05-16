@@ -13,7 +13,8 @@ import {
 import { AuthService } from './auth.service';
 import {
   RegisterAuthDto,
-  CodeVerifyAuthDto,
+  ResendCodeAuthDto,
+  VerifyCodeAuthDto,
 } from 'src/modules/auth/dto/auth.dto';
 
 // @UseInterceptors(ClassSerializerInterceptor)
@@ -26,8 +27,13 @@ export class AuthController {
     return this.authService.register(data);
   }
 
-  @Post('code-verify')
-  codeVerify(@Body() data: CodeVerifyAuthDto) {
-    return this.authService.codeVerify(data);
+  @Post('verify-code')
+  verifyCode(@Body() data: VerifyCodeAuthDto) {
+    return this.authService.verifyCode(data);
+  }
+
+  @Post('resend-code')
+  resendCode(@Body() data: ResendCodeAuthDto) {
+    return this.authService.resendCode(data);
   }
 }
