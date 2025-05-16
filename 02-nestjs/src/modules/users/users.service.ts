@@ -29,7 +29,7 @@ export class UsersService {
     await this.mailerService.sendMail({
       to: user.email,
       subject: 'Kích hoạt tài khoản của bạn',
-      template: 'sendEmailCode',
+      template: 'accountActivation',
       context: {
         fullName: user.fullName,
         activationCode: activationCode,
