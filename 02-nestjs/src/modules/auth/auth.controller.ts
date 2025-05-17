@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
+  ForwardPasswordAuthDto,
   RegisterAuthDto,
   ResendCodeAuthDto,
   VerifyCodeAuthDto,
@@ -60,5 +61,12 @@ export class AuthController {
   @Get('profile')
   getProfile() {
     return 'oke';
+  }
+
+  @ResponseMessage('Đã gửi mã kích hoạt đến email của bạn')
+  @Public()
+  @Post('forward-password')
+  forwardPassword(@Body() data: ForwardPasswordAuthDto) {
+    return this.authService.forwardPassword(data);
   }
 }

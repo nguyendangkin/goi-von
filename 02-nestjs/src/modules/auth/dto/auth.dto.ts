@@ -41,3 +41,9 @@ export class LoginAuthDto {
   @IsNotEmpty({ message: 'Email không được để trống' })
   password: string;
 }
+
+export class ForwardPasswordAuthDto {
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  @IsEmail({}, { message: 'Email không đúng định dạng' })
+  email: string;
+}

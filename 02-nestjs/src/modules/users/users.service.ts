@@ -8,6 +8,7 @@ import * as dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { MailerService } from '@nestjs-modules/mailer';
 import {
+  ForwardPasswordAuthDto,
   RegisterAuthDto,
   ResendCodeAuthDto,
   VerifyCodeAuthDto,
@@ -134,5 +135,9 @@ export class UsersService {
     await this.usersRepository.save(user);
     // Send email
     await this.sendActivationEmail(user, activationCode);
+  }
+
+  async forwardPassword(data: ForwardPasswordAuthDto) {
+    return 'oke';
   }
 }

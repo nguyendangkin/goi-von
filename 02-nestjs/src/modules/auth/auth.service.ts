@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
+  ForwardPasswordAuthDto,
   RegisterAuthDto,
   ResendCodeAuthDto,
   VerifyCodeAuthDto,
@@ -54,5 +55,9 @@ export class AuthService {
       },
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async forwardPassword(data: ForwardPasswordAuthDto) {
+    return this.usersService.forwardPassword(data);
   }
 }
