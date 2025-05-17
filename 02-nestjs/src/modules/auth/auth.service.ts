@@ -1,15 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import {
   RegisterAuthDto,
   ResendCodeAuthDto,
   VerifyCodeAuthDto,
 } from 'src/modules/auth/dto/auth.dto';
+import { User } from 'src/modules/users/entities/user.entity';
 
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
   register(data: RegisterAuthDto) {
     return this.usersService.register(data);
   }
@@ -20,5 +25,34 @@ export class AuthService {
 
   resendCode(data: ResendCodeAuthDto) {
     return this.usersService.resendCode(data);
+  }
+
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.usersService.findUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+    // Kiểm tra mật khẩu
+    const isMatch = await this.usersService.comparePassword(
+      password,
+      user.password,
+    );
+
+    if (!isMatch) {
+      return null;
+    }
+    return user;
+  }
+
+  async login(user: User) {
+    const payload = { email: user.email, id: user.id };
+    return {
+      user: {
+        email: user.email,
+        id: user.id,
+        fullName: user.fullName,
+      },
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

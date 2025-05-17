@@ -71,10 +71,6 @@ export class UsersService {
     user.activationCode = null;
     user.codeExpired = null;
     await this.usersRepository.save(user);
-
-    return {
-      message: 'Tài khoản kích hoạt thành công',
-    };
   }
 
   async checkEmailExist(email: string) {
@@ -89,6 +85,10 @@ export class UsersService {
   async hashPassword(password: string) {
     const saltOrRounds = 10;
     return await bcrypt.hash(password, saltOrRounds);
+  }
+
+  async comparePassword(password: string, hashPassword: string) {
+    return await bcrypt.compare(password, hashPassword);
   }
 
   async register(data: RegisterAuthDto) {
@@ -110,7 +110,6 @@ export class UsersService {
     // Send email
     await this.sendActivationEmail(user, activationCode);
     return {
-      message: 'Đăng ký tài khoản thành công, vui lòng kích hoạt',
       id: user.id,
     };
   }
@@ -135,8 +134,5 @@ export class UsersService {
     await this.usersRepository.save(user);
     // Send email
     await this.sendActivationEmail(user, activationCode);
-    return {
-      message: 'Đã gửi lại mã kích hoạt',
-    };
   }
 }

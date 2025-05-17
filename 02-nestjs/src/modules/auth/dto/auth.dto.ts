@@ -32,3 +32,12 @@ export class ResendCodeAuthDto {
   @IsEmail({}, { message: 'Email không đúng định dạng' })
   email: string;
 }
+
+export class LoginAuthDto {
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  @IsEmail({}, { message: 'Email không đúng định dạng' })
+  email: string;
+
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  password: string;
+}
