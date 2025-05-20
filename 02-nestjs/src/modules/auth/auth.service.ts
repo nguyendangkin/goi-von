@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   ForwardPasswordActivationCodedAuthDto,
@@ -8,7 +8,6 @@ import {
   VerifyCodeAuthDto,
 } from 'src/modules/auth/dto/auth.dto';
 import { User } from 'src/modules/users/entities/user.entity';
-
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
@@ -17,16 +16,16 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
-  register(data: RegisterAuthDto) {
-    return this.usersService.register(data);
+  async register(data: RegisterAuthDto) {
+    return await this.usersService.register(data);
   }
 
-  verifyCode(data: VerifyCodeAuthDto) {
-    return this.usersService.verifyCode(data);
+  async verifyCode(data: VerifyCodeAuthDto) {
+    return await this.usersService.verifyCode(data);
   }
 
-  resendCode(data: ResendCodeAuthDto) {
-    return this.usersService.resendCode(data);
+  async resendCode(data: ResendCodeAuthDto) {
+    return await this.usersService.resendCode(data);
   }
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -59,10 +58,10 @@ export class AuthService {
   }
 
   async forwardPassword(data: ForwardPasswordAuthDto) {
-    return this.usersService.forwardPassword(data);
+    return await this.usersService.forwardPassword(data);
   }
 
   async forwardPasswordVerifyCode(data: ForwardPasswordActivationCodedAuthDto) {
-    return this.usersService.forwardPasswordVerifyCode(data);
+    return await this.usersService.forwardPasswordVerifyCode(data);
   }
 }

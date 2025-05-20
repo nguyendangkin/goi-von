@@ -5,7 +5,6 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as dayjs from 'dayjs';
-import { v4 as uuidv4 } from 'uuid';
 import { MailerService } from '@nestjs-modules/mailer';
 import {
   ForwardPasswordActivationCodedAuthDto,
@@ -30,7 +29,7 @@ export class UsersService {
   async sendActivationEmail(user: User, activationCode: string) {
     await this.mailerService.sendMail({
       to: user.email,
-      subject: 'Kích hoạt tài khoản của bạn',
+      subject: 'Mã xác nhận của bạn',
       template: 'accountActivation',
       context: {
         fullName: user.fullName,
@@ -43,40 +42,6 @@ export class UsersService {
     return await this.usersRepository.findOne({
       where: { email: email },
     });
-  }
-
-  async verifyCode(data: VerifyCodeAuthDto) {
-    // Find user by email
-    const user = await this.findUserByEmail(data.email);
-    if (!user) {
-      throw new BadRequestException('Email không tồn tại.');
-    }
-    // Check isActive?
-    if (user.isActive) {
-      throw new BadRequestException('Tài khoản đã được kích hoạt');
-    }
-
-    // Check expired date
-    const isExpired = dayjs().isAfter(user.codeExpired);
-    if (isExpired) {
-      console.log(isExpired);
-      throw new BadRequestException('Mã kích hoạt đã hết hạn');
-    }
-
-    // Check code
-    if (user.activationCode !== data.activationCode) {
-      throw new BadRequestException('Mã kích hoạt không kích xác');
-    }
-
-    // Update and save
-    user.isActive = true;
-    user.activationCode = null;
-    user.codeExpired = null;
-    await this.usersRepository.save(user);
-
-    return {
-      id: user.id,
-    };
   }
 
   async checkEmailExist(email: string) {
@@ -140,6 +105,40 @@ export class UsersService {
     await this.usersRepository.save(user);
     // Send email
     await this.sendActivationEmail(user, activationCode);
+
+    return {
+      id: user.id,
+    };
+  }
+
+  async verifyCode(data: VerifyCodeAuthDto) {
+    // Find user by email
+    const user = await this.findUserByEmail(data.email);
+    if (!user) {
+      throw new BadRequestException('Email không tồn tại.');
+    }
+    // Check isActive?
+    if (user.isActive) {
+      throw new BadRequestException('Tài khoản đã được kích hoạt');
+    }
+
+    // Check expired date
+    const isExpired = dayjs().isAfter(user.codeExpired);
+    if (isExpired) {
+      console.log(isExpired);
+      throw new BadRequestException('Mã kích hoạt đã hết hạn');
+    }
+
+    // Check code
+    if (user.activationCode !== data.activationCode) {
+      throw new BadRequestException('Mã kích hoạt không kích xác');
+    }
+
+    // Update and save
+    user.isActive = true;
+    user.activationCode = null;
+    user.codeExpired = null;
+    await this.usersRepository.save(user);
 
     return {
       id: user.id,

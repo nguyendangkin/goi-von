@@ -7,8 +7,6 @@ import { LocalStrategy } from 'src/modules/auth/passport/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from 'src/modules/auth/passport/jwt.strategy';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from 'src/modules/auth/passport/jwt-auth.guard';
 
 @Module({
   imports: [
