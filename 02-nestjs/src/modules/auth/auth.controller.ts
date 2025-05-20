@@ -3,27 +3,20 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  BadRequestException,
-  UseInterceptors,
-  ClassSerializerInterceptor,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
+  ForwardPasswordActivationCodedAuthDto,
   ForwardPasswordAuthDto,
   RegisterAuthDto,
   ResendCodeAuthDto,
   VerifyCodeAuthDto,
 } from 'src/modules/auth/dto/auth.dto';
 import { LocalAuthGuard } from 'src/modules/auth/passport/local-auth.guard';
-import { JwtAuthGuard } from 'src/modules/auth/passport/jwt-auth.guard';
 import { Public, ResponseMessage } from 'src/decorator/decorators';
 
-// @UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -57,16 +50,19 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @ResponseMessage('Lấy thành công')
-  @Get('profile')
-  getProfile() {
-    return 'oke';
-  }
-
   @ResponseMessage('Đã gửi mã kích hoạt đến email của bạn')
   @Public()
   @Post('forward-password')
   forwardPassword(@Body() data: ForwardPasswordAuthDto) {
     return this.authService.forwardPassword(data);
+  }
+
+  @ResponseMessage('Đổi mật khẩu thành công')
+  @Public()
+  @Post('forward-password-verify-code')
+  forwardPasswordVerifyCode(
+    @Body() data: ForwardPasswordActivationCodedAuthDto,
+  ) {
+    return this.authService.forwardPasswordVerifyCode(data);
   }
 }

@@ -47,3 +47,18 @@ export class ForwardPasswordAuthDto {
   @IsEmail({}, { message: 'Email không đúng định dạng' })
   email: string;
 }
+
+export class ForwardPasswordActivationCodedAuthDto {
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  @IsEmail({}, { message: 'Email không đúng định dạng' })
+  email: string;
+
+  @IsNotEmpty({ message: 'Mã kích hoạt không được để trống' })
+  activationCode: string;
+
+  @IsNotEmpty({ message: 'Mật khẩu không được để trống' })
+  @MinLength(6, {
+    message: 'Mật khẩu ít nhất phải có 6 ký tự',
+  })
+  password: string;
+}

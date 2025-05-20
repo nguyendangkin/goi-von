@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
+  ForwardPasswordActivationCodedAuthDto,
   ForwardPasswordAuthDto,
   RegisterAuthDto,
   ResendCodeAuthDto,
@@ -59,5 +60,9 @@ export class AuthService {
 
   async forwardPassword(data: ForwardPasswordAuthDto) {
     return this.usersService.forwardPassword(data);
+  }
+
+  async forwardPasswordVerifyCode(data: ForwardPasswordActivationCodedAuthDto) {
+    return this.usersService.forwardPasswordVerifyCode(data);
   }
 }

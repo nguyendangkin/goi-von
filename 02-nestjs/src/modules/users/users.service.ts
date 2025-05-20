@@ -8,6 +8,7 @@ import * as dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { MailerService } from '@nestjs-modules/mailer';
 import {
+  ForwardPasswordActivationCodedAuthDto,
   ForwardPasswordAuthDto,
   RegisterAuthDto,
   ResendCodeAuthDto,
@@ -72,6 +73,10 @@ export class UsersService {
     user.activationCode = null;
     user.codeExpired = null;
     await this.usersRepository.save(user);
+
+    return {
+      id: user.id,
+    };
   }
 
   async checkEmailExist(email: string) {
@@ -135,9 +140,60 @@ export class UsersService {
     await this.usersRepository.save(user);
     // Send email
     await this.sendActivationEmail(user, activationCode);
+
+    return {
+      id: user.id,
+    };
   }
 
   async forwardPassword(data: ForwardPasswordAuthDto) {
-    return 'oke';
+    // Check email
+    const user = await this.findUserByEmail(data.email);
+    if (!user) {
+      throw new BadRequestException('Email không tồn tại');
+    }
+
+    // Update user
+    const activationCode = this.generateCode();
+    user.activationCode = activationCode;
+    user.codeExpired = dayjs().add(5, 'minutes').toDate();
+    await this.usersRepository.save(user);
+
+    // Send email
+    await this.sendActivationEmail(user, activationCode);
+
+    return {
+      id: user.id,
+      email: user.email,
+    };
+  }
+
+  async forwardPasswordVerifyCode(data: ForwardPasswordActivationCodedAuthDto) {
+    // Check email
+    const user = await this.findUserByEmail(data.email);
+    if (!user) {
+      throw new BadRequestException('Email không tồn tại');
+    }
+
+    // Check expired date
+    const isExpired = dayjs().isAfter(user.codeExpired);
+    if (isExpired) {
+      throw new BadRequestException('Mã kích hoạt đã hết hạn');
+    }
+    // Check code
+    if (user.activationCode !== data.activationCode) {
+      throw new BadRequestException('Mã kích hoạt không chính xác');
+    }
+
+    // Hash password
+    const newPassword = await this.hashPassword(data.password);
+    // Update and save
+    user.password = newPassword;
+    user.activationCode = null;
+    user.codeExpired = null;
+    await this.usersRepository.save(user);
+    return {
+      id: user.id,
+    };
   }
 }
