@@ -2,7 +2,10 @@
 
 import React from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Flex } from "antd";
+import { Button, Form, Input, Flex } from "antd";
+import { Typography } from "antd";
+
+const { Title } = Typography;
 
 const LoginUi: React.FC = () => {
     const onFinish = (values: any) => {
@@ -17,6 +20,7 @@ const LoginUi: React.FC = () => {
                 style={{ width: "80%", maxWidth: "400px" }}
                 onFinish={onFinish}
             >
+                <Title level={3}>Đăng Nhập</Title>
                 <Form.Item
                     name="email"
                     rules={[
