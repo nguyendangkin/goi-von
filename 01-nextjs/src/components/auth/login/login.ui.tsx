@@ -4,12 +4,16 @@ import React from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Flex } from "antd";
 import { Typography } from "antd";
+import { signIn } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
+import { authenticate } from "@/actions/actions";
 
 const { Title } = Typography;
 
 const LoginUi: React.FC = () => {
-    const onFinish = (values: any) => {
-        console.log("Received values of form: ", values);
+    const onFinish = async (values: any) => {
+        const data = await authenticate(values);
+        console.log(data);
     };
 
     return (
