@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 const { Title } = Typography;
 
-const LoginUi: React.FC = () => {
+export default function RegisterUi() {
     const router = useRouter();
     const onFinish = async (values: any) => {
         const data = await authenticate(values);
@@ -37,7 +37,7 @@ const LoginUi: React.FC = () => {
                 style={{ width: "80%", maxWidth: "400px" }}
                 onFinish={onFinish}
             >
-                <Title level={3}>Đăng Nhập</Title>
+                <Title level={3}>Đăng Ký</Title>
                 <Form.Item
                     name="email"
                     rules={[
@@ -64,6 +64,36 @@ const LoginUi: React.FC = () => {
                         placeholder="Mật khẩu"
                     />
                 </Form.Item>
+                <Form.Item
+                    name="password"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Vui lòng nhập Mật khẩu của bạn!",
+                        },
+                    ]}
+                >
+                    <Input
+                        prefix={<LockOutlined />}
+                        type="password"
+                        placeholder="Mật khẩu"
+                    />
+                </Form.Item>
+                <Form.Item
+                    name="password"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Vui lòng nhập Mật khẩu của bạn!",
+                        },
+                    ]}
+                >
+                    <Input
+                        prefix={<LockOutlined />}
+                        type="password"
+                        placeholder="Mật khẩu"
+                    />
+                </Form.Item>
                 <Form.Item>
                     <Flex justify="space-between" align="center">
                         <a href="">Quên mật khẩu</a>
@@ -74,11 +104,9 @@ const LoginUi: React.FC = () => {
                     <Button block type="primary" htmlType="submit">
                         Đăng nhập
                     </Button>
-                    hoặc <a href="">Đăng ký ngay bây giờ!</a>
+                    hoặc <a href="">Đăng nhập ngay bây giờ!</a>
                 </Form.Item>
             </Form>
         </Flex>
     );
-};
-
-export default LoginUi;
+}

@@ -26,8 +26,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     },
                 });
 
-                console.log("data", data);
-
                 if (+data.statusCode === 201) {
                     return {
                         id: data.data?.user.id,
@@ -59,6 +57,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session({ session, token }) {
             (session.user as IUser) = token.user;
             return session;
+        },
+
+        authorized: async ({ auth }) => {
+            // Logged in users are authenticated,
+            //otherwise redirect to login page
+            return !!auth;
         },
     },
 });
